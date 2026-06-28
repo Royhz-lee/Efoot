@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Munene Esports Arena - eFootball Tournament Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==================== VARIABLES & RESET ==================== */
+        :root {
+            --primary-dark: #0a0e27;
+            --secondary-dark: #0f1419;
+            --card-dark: #1a1f3a;
+            --accent-gold: #ffd700;
+            --accent-blue: #00d4ff;
+            --accent-electric: #0099ff;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --success: #00ff88;
+            --danger: #ff4444;
+            --warning: #ffaa00;
+            --border-color: #2a2f4a;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ==================== TYPOGRAPHY ==================== */
+        h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1px; }
+        h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 1.5rem; }
+        h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; }
+        h4 { font-size: 1.1rem; font-weight: 600; }
+        p { color: var(--text-secondary); margin-bottom: 1rem; }
+
+        a { color: var(--accent-blue); text-decoration: none; transition: var(--transition); }
+        a:hover { color: var(--accent-gold); }
+
+        /* ==================== UTILITY CLASSES ==================== */
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 2rem; }
+        .gap-1 { gap: 1rem; }
+
+        .text-center { text-align: center; }
+        .text-gold { color: var(--accent-gold); }
+        .text-blue { color: var(--accent-blue); }
+        .text-success { color: var(--success); }
+
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-electric) 100%);
+            color: var(--primary-dark);
+            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent-blue);
+            border: 2px solid var(--accent-blue);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-blue);
+            color: var(--primary-dark);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        /* ==================== NAVIGATION ==================== */
+        header {
+            background: rgba(15, 20, 25, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: fit-content;
+        }
+
+        .logo i { font-size: 1.8rem; }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-weight: 600;
+            font-size: 0.95rem;
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-gold);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--accent-gold);
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+
+        /* ==================== HERO SECTION ==================== */
+        .hero {
+            position: relative;
+            padding: 100px 20px;
+            text-align: center;
+            overflow: hidden;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            animation: float 15s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite reverse;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            animation: slideInUp 1s ease-out;
+        }
+
+        .hero h1 {
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        /* ==================== SECTIONS ==================== */
+        .section {
+            padding: 80px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .section h2 {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-blue) 100%);
+            border-radius: 2px;
+        }
+
+        /* ==================== CARDS ==================== */
+        .card {
+            background: var(--card-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-gold), transparent);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+        }
+
+        /* ==================== GRID ==================== */
+        .grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .grid-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+        /* ==================== TOURNAMENT CARDS ==================== */
+        .tournament-card {
+            position: relative;
+            height: 100%;
+        }
+
+        .tournament-header {
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-blue) 100%);
+            padding: 2rem;
+            border-radius: 12px 12px 0 0;
+            color: var(--primary-dark);
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .tournament-body {
+            padding: 2rem;
+            background: var(--card-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 12px 12px;
+        }
+
+        .prize-pool {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin: 1rem 0;
+        }
+
+        .tournament-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tournament-stat:last-child {
+            border-bottom: none;
+        }
+
+        .tournament-stat label {
+            color: var(--text-secondary);
+        }
+
+        .tournament-stat value {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        /* ==================== STATS SECTION ==================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        /* ==================== DASHBOARD ==================== */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .sidebar {
+            background: var(--card-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: var(--transition);
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-blue);
+            padding-left: 20px;
+        }
+
+        .sidebar-menu i {
+            font-size: 1.2rem;
+            min-width: 20px;
+        }
+
+        .main-content {
+            background: var(--card-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        /* ==================== DASHBOARD CARDS ==================== */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 12px;
+        }
+
+        .balance-label {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .balance-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .balance-change {
+            font-size: 0.9rem;
+            color: var(--success);
+        }
+
+        /* ==================== TABLES ==================== */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--accent-blue);
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .status-completed {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-blue);
+        }
+
+        /* ==================== FORMS ==================== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            background: var(--secondary-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* ==================== MODALS ==================== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideInDown 0.3s ease-out;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--accent-gold);
+        }
+
+        /* ==================== FOOTER ==================== */
+        footer {
+            background: var(--secondary-dark);
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 20px 1rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: var(--accent-gold);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .footer-section a:hover {
+            color: var(--accent-gold);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--accent-gold);
+            color: var(--primary-dark);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(20px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+            50% { text-shadow: 0 0 30px rgba(0, 212, 255, 0.5); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 80px;
+                width: 250px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: var(--transition);
+                z-index: 1500;
+                border-radius: 0;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.8rem; }
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                padding: 50px 20px;
+            }
+
+            .hero {
+                padding: 60px 20px;
+                min-height: 60vh;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.85rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .auth-buttons {
+                gap: 0.5rem;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.3rem; }
+            h3 { font-size: 1.1rem; }
+
+            .logo {
+                font-size: 1rem;
+            }
+
+            .hero {
+                padding: 40px 15px;
+            }
+
+            .section {
+                padding: 40px 15px;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .dashboard {
+                padding: 1rem;
+            }
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.75rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <header id="header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-gamepad"></i>
+                    Munene Arena
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#" onclick="navigate('home')">Home</a></li>
+                    <li><a href="#" onclick="navigate('tournaments')">Tournaments</a></li>
+                    <li><a href="#" onclick="navigate('leagues')">Leagues</a></li>
+                    <li><a href="#" onclick="navigate('leaderboard')">Leaderboard</a></li>
+                    <li><a href="#" onclick="navigate('sponsors')">Sponsors</a></li>
+                    <li><a href="#" onclick="navigate('about')">About</a></li>
+                    <li><a href="#" onclick="navigate('contact')">Contact</a></li>
+                </ul>
+                <div class="auth-buttons">
+                    <button class="btn btn-secondary btn-small" onclick="navigate('login')">Login</button>
+                    <button class="btn btn-primary btn-small" onclick="navigate('register')">Register</button>
+                    <div class="hamburger" onclick="toggleMenu()">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main id="app"></main>
+
+    <!-- FOOTER -->
+    <footer id="footer" class="hidden">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>About Munene</h4>
+                    <p>The premier eFootball tournament platform in East Africa. Connect, compete, and win big.</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="#" onclick="navigate('tournaments')">Tournaments</a></li>
+                        <li><a href="#" onclick="navigate('leagues')">Leagues</a></li>
+                        <li><a href="#" onclick="navigate('leaderboard')">Leaderboard</a></li>
+                        <li><a href="#" onclick="navigate('wallet')">Wallet</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#" onclick="navigate('terms')">Terms of Service</a></li>
+                        <li><a href="#" onclick="navigate('privacy')">Privacy Policy</a></li>
+                        <li><a href="#" onclick="navigate('responsible')">Responsible Gaming</a></li>
+                        <li><a href="#" onclick="navigate('contact')">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="mailto:support@munenearena.com">support@munenearena.com</a></li>
+                        <li><a href="tel:+254708636339">+254 708 636 339</a></li>
+                        <li>Available 24/7</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Munene Esports Arena. All rights reserved. | Responsible Gaming | Age 18+</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ==================== STATE MANAGEMENT ====================
+        const app = {
+            currentPage: 'home',
+            isLoggedIn: localStorage.getItem('isLoggedIn') === 'true',
+            user: JSON.parse(localStorage.getItem('user')) || null,
+            sidebar: false,
+
+            // Sample data
+            tournaments: [
+                {
+                    id: 1,
+                    name: 'African Cup 2024',
+                    entry: 5000,
+                    prize: 500000,
+                    participants: 128,
+                    slots: 12,
+                    stage: 'Registration',
+                    startDate: 'July 15, 2024'
+                },
+                {
+                    id: 2,
+                    name: 'Elite Challenge',
+                    entry: 2000,
+                    prize: 200000,
+                    participants: 64,
+                    slots: 36,
+                    stage: 'Group Stage',
+                    startDate: 'June 28, 2024'
+                },
+                {
+                    id: 3,
+                    name: 'Rookie Rumble',
+                    entry: 500,
+                    prize: 50000,
+                    participants: 256,
+                    slots: 0,
+                    stage: 'Round of 64',
+                    startDate: 'June 21, 2024'
+                },
+                {
+                    id: 4,
+                    name: 'Weekend Warrior',
+                    entry: 1000,
+                    prize: 100000,
+                    participants: 32,
+                    slots: 64,
+                    stage: 'Quarter Finals',
+                    startDate: 'July 8, 2024'
+                }
+            ],
+
+            leagues: [
+                { id: 1, name: 'Bronze League', entry: 500, prize: 50000, participants: 1000 },
+                { id: 2, name: 'Silver League', entry: 2000, prize: 200000, participants: 500 },
+                { id: 3, name: 'Gold League', entry: 5000, prize: 500000, participants: 250 },
+                { id: 4, name: 'Platinum League', entry: 10000, prize: 1000000, participants: 100 },
+                { id: 5, name: 'Champions League', entry: 20000, prize: 2000000, participants: 50 }
+            ],
+
+            leaderboard: [
+                { rank: 1, name: 'ProGamer_KE', wins: 487, points: 15420, league: 'Champions' },
+                { rank: 2, name: 'EliteStrike', wins: 412, points: 14890, league: 'Champions' },
+                { rank: 3, name: 'LegendaryOne', wins: 389, points: 14200, league: 'Champions' },
+                { rank: 4, name: 'TacticalMind', wins: 345, points: 12500, league: 'Platinum' },
+                { rank: 5, name: 'SwiftShooter', wins: 298, points: 11200, league: 'Platinum' },
+                { rank: 6, name: 'CyberNinja', wins: 276, points: 10100, league: 'Gold' },
+                { rank: 7, name: 'VortexKing', wins: 234, points: 9200, league: 'Gold' },
+                { rank: 8, name: 'PhantomScore', wins: 198, points: 7800, league: 'Silver' },
+                { rank: 9, name: 'IceBreaker', wins: 156, points: 6500, league: 'Silver' },
+                { rank: 10, name: 'ThunderStrike', wins: 142, points: 5900, league: 'Bronze' }
+            ],
+
+            transactions: [
+                { date: '2024-06-28', type: 'Deposit', amount: 5000, status: 'Completed', method: 'M-Pesa' },
+                { date: '2024-06-27', type: 'Tournament Win', amount: 15000, status: 'Completed', method: 'Prize' },
+                { date: '2024-06-26', type: 'Withdrawal', amount: 10000, status: 'Pending', method: 'M-Pesa' },
+                { date: '2024-06-25', type: 'Deposit', amount: 2000, status: 'Completed', method: 'Pesapal' }
+            ]
+        };
+
+        // ==================== NAVIGATION ====================
+        function navigate(page) {
+            app.currentPage = page;
+            renderPage();
+            window.scrollTo(0, 0);
+            closeSidebar();
+        }
+
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('active');
+                app.sidebar = !app.sidebar;
+            }
+        }
+
+        function closeSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                sidebar.classList.remove('active');
+                app.sidebar = false;
+            }
+        }
+
+        // ==================== PAGE RENDERING ====================
+        function renderPage() {
+            const appDiv = document.getElementById('app');
+            const footerDiv = document.getElementById('footer');
+            let html = '';
+
+            switch(app.currentPage) {
+                case 'home':
+                    footerDiv.classList.remove('hidden');
+                    html = renderHome();
+                    break;
+                case 'register':
+                    footerDiv.classList.add('hidden');
+                    html = renderRegister();
+                    break;
+                case 'login':
+                    footerDiv.classList.add('hidden');
+                    html = renderLogin();
+                    break;
+                case 'tournaments':
+                    footerDiv.classList.remove('hidden');
+                    html = renderTournaments();
+                    break;
+                case 'leagues':
+                    footerDiv.classList.remove('hidden');
+                    html = renderLeagues();
+                    break;
+                case 'leaderboard':
+                    footerDiv.classList.remove('hidden');
+                    html = renderLeaderboard();
+                    break;
+                case 'dashboard':
+                    footerDiv.classList.add('hidden');
+                    html = renderDashboard();
+                    break;
+                case 'wallet':
+                    footerDiv.classList.add('hidden');
+                    html = renderWallet();
+                    break;
+                case 'kyc':
+                    footerDiv.classList.add('hidden');
+                    html = renderKYC();
+                    break;
+                case 'sponsors':
+                    footerDiv.classList.remove('hidden');
+                    html = renderSponsors();
+                    break;
+                case 'about':
+                    footerDiv.classList.remove('hidden');
+                    html = renderAbout();
+                    break;
+                case 'contact':
+                    footerDiv.classList.remove('hidden');
+                    html = renderContact();
+                    break;
+                case 'terms':
+                    footerDiv.classList.remove('hidden');
+                    html = renderTerms();
+                    break;
+                case 'privacy':
+                    footerDiv.classList.remove('hidden');
+                    html = renderPrivacy();
+                    break;
+                case 'responsible':
+                    footerDiv.classList.remove('hidden');
+                    html = renderResponsible();
+                    break;
+                default:
+                    html = renderHome();
+            }
+
+            appDiv.innerHTML = html;
+        }
+
+        // ==================== PAGE TEMPLATES ====================
+        function renderHome() {
+            return `
+                <section class="hero">
+                    <div class="hero-content">
+                        <h1>COMPETE. WIN. DOMINATE.</h1>
+                        <p>Join Africa's premier eFootball tournament platform. Play against the best, win real money, and become a legend.</p>
+                        <div class="hero-buttons">
+                            <button class="btn btn-primary" onclick="navigate('tournaments')">
+                                <i class="fas fa-trophy"></i> Explore Tournaments
+                            </button>
+                            <button class="btn btn-secondary" onclick="navigate('register')">
+                                <i class="fas fa-user-plus"></i> Get Started
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="container">
+                        <h2>Featured Tournaments</h2>
+                        <div class="grid grid-2">
+                            ${app.tournaments.slice(0, 2).map(tournament => `
+                                <div class="card tournament-card">
+                                    <div class="tournament-header">${tournament.name}</div>
+                                    <div class="tournament-body">
+                                        <div class="prize-pool">KES ${tournament.prize.toLocaleString()}</div>
+                                        <div class="tournament-stat">
+                                            <label>Entry Fee:</label>
+                                            <value>KES ${tournament.entry.toLocaleString()}</value>
+                                        </div>
+                                        <div class="tournament-stat">
+                                            <label>Participants:</label>
+                                            <value>${tournament.participants}</value>
+                                        </div>
+                                        <div class="tournament-stat">
+                                            <label>Slots Available:</label>
+                                            <value>${tournament.slots}</value>
+                                        </div>
+                                        <div class="tournament-stat">
+                                            <label>Stage:</label>
+                                            <value>${tournament.stage}</value>
+                                        </div>
+                                        <div class="tournament-stat">
+                                            <label>Starts:</label>
+                                            <value>${tournament.startDate}</value>
+                                        </div>
+                                        <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">
+                                            <i class="fas fa-sign-in-alt"></i> Register Now
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="container">
+                        <h2>Our Leagues</h2>
+                        <div class="grid grid-3">
+                            ${app.leagues.map(league => `
+                                <div class="card">
+                                    <div class="card-icon"><i class="fas fa-crown"></i></div>
+                                    <h4>${league.name}</h4>
+                                    <p>Entry: <span class="text-gold">KES ${league.entry.toLocaleString()}</span></p>
+                                    <p>Prize Pool: <span class="text-blue">KES ${league.prize.toLocaleString()}</span></p>
+                                    <p>Players: <strong>${league.participants}</strong></p>
+                                    <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                                        <i class="fas fa-arrow-right"></i> Join League
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="container">
+                        <h2>Platform Statistics</h2>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number">50K+</div>
+                                <div class="stat-label">Active Players</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">500+</div>
+                                <div class="stat-label">Monthly Tournaments</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">KES 100M+</div>
+                                <div class="stat-label">Total Prize Pool</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">24/7</div>
+                                <div class="stat-label">Customer Support</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="container">
+                        <h2>Top Players</h2>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Player</th>
+                                        <th>Wins</th>
+                                        <th>Points</th>
+                                        <th>League</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${app.leaderboard.slice(0, 5).map(player => `
+                                        <tr>
+                                            <td><strong>${player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : player.rank}</strong></td>
+                                            <td>${player.name}</td>
+                                            <td>${player.wins}</td>
+                                            <td class="text-gold"><strong>${player.points.toLocaleString()}</strong></td>
+                                            <td><span class="status-badge status-active">${player.league}</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button class="btn btn-secondary" onclick="navigate('leaderboard')">
+                                <i class="fas fa-chart-line"></i> View Full Leaderboard
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="container">
+                        <h2>Why Choose Munene Arena?</h2>
+                        <div class="grid grid-3">
+                            <div class="card">
+                                <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+                                <h4>Secure Platform</h4>
+                                <p>SSL encrypted, secure payment gateway, and KYC verification for player protection.</p>
+                            </div>
+                            <div class="card">
+                                <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                                <h4>Real-Time Matches</h4>
+                                <p>Live tournaments, instant payouts, and real-time leaderboards.</p>
+                            </div>
+                            <div class="card">
+                                <div class="card-icon"><i class="fas fa-users"></i></div>
+                                <h4>Community Driven</h4>
+                                <p>Connect with thousands of players, join teams, and build your gaming legacy.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderRegister() {
+            return `
+                <section class="section flex items-center justify-center">
+                    <div class="card" style="max-width: 500px; width: 100%;">
+                        <h2 style="text-align: center; margin-bottom: 2rem;">Create Your Account</h2>
+                        <form id="registerForm" onsubmit="handleRegister(event)">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="username"><i class="fas fa-user"></i> Username</label>
+                                    <input type="text" id="username" name="username" required placeholder="Choose your gaming name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fullname"><i class="fas fa-id-card"></i> Full Name</label>
+                                    <input type="text" id="fullname" name="fullname" required placeholder="Your legal name">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+                                <input type="email" id="email" name="email" required placeholder="your@email.com">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="phone"><i class="fas fa-phone"></i> Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" required placeholder="+254 7XX XXX XXX">
+                                </div>
+                                <div class="form-group">
+                                    <label for="country"><i class="fas fa-globe"></i> Country</label>
+                                    <select id="country" name="country" required>
+                                        <option>Select Country</option>
+                                        <option>Kenya</option>
+                                        <option>Uganda</option>
+                                        <option>Tanzania</option>
+                                        <option>Nigeria</option>
+                                        <option>South Africa</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="password"><i class="fas fa-lock"></i> Password</label>
+                                    <input type="password" id="password" name="password" required placeholder="Min 8 characters">
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirmPassword"><i class="fas fa-lock"></i> Confirm Password</label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Repeat password">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" required> I agree to Terms of Service and Privacy Policy
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                                <i class="fas fa-user-plus"></i> Create Account
+                            </button>
+                            <p style="text-align: center;">Already have an account? <a href="#" onclick="navigate('login')" style="cursor: pointer;">Login here</a></p>
+                        </form>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderLogin() {
+            return `
+                <section class="section flex items-center justify-center">
+                    <div class="card" style="max-width: 500px; width: 100%;">
+                        <h2 style="text-align: center; margin-bottom: 2rem;">Welcome Back</h2>
+                        <form id="loginForm" onsubmit="handleLogin(event)">
+                            <div class="form-group">
+                                <label for="loginEmail"><i class="fas fa-envelope"></i> Email or Username</label>
+                                <input type="text" id="loginEmail" name="email" required placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="loginPassword"><i class="fas fa-lock"></i> Password</label>
+                                <input type="password" id="loginPassword" name="password" required placeholder="Enter your password">
+                            </div>
+                            <div class="form-group flex justify-between items-center">
+                                <label>
+                                    <input type="checkbox"> Remember me
+                                </label>
+                                <a href="#" onclick="alert('Password reset feature coming soon!')">Forgot password?</a>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </button>
+                            <p style="text-align: center;">Don't have an account? <a href="#" onclick="navigate('register')" style="cursor: pointer;">Register now</a></p>
+                        </form>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderTournaments() {
+            return `
+                <section class="section">
+                    <div class="container">
+                        <h2>All Tournaments</h2>
+                        <div class="grid grid-2">
+                            ${app.tournaments.map(tournament => `
+                                <div class="card tournament-card">
+                                    <div class="tournament-header">${tournament.name}</div>
+                                    <div class="tournament-body">
+                                        <div class="prize-pool">KES ${tournament.prize.toLocaleString()}</div>
+                                        <div class="tournament-stat">
+                                            <label>Entry Fee:</label>
+                                            <value>KES ${tournament.entry.toLocaleString()}</value>
+                                        </div>
+                                        <div class="tournament-stat">
+                                            <label>Participants:</label>
+                                            <value>${tournament.participants}</value>
+                                        </div>
+                                        <div class="tournament-stat">
+                                            <label>Slots Available:</label>
+                                            <value>${tournament.slots}</value>
+                                        </div>
+                                        <div class="tournament-stat">
+                                            <label>Current Stage:</label>
+                                            <value><span class="status-badge status-active">${tournament.stage}</span></value>
+                                        </div>
+                                        <div class="tournament-stat">
+                                            <label>Starts:</label>
+                                            <value>${tournament.startDate}</value>
+                                        </div>
+                                        <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" onclick="${tournament.slots > 0 ? 'alert(\"Login to register!\")' : 'alert(\"Tournament is full\")';}">
+                                            <i class="fas fa-sign-in-alt"></i> ${tournament.slots > 0 ? 'Register Now' : 'Tournament Full'}
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="container">
+                        <h2>Tournament Stages</h2>
+                        <div class="grid grid-4">
+                            <div class="card" style="text-align: center;">
+                                <div class="card-icon"><i class="fas fa-clipboard-list"></i></div>
+                                <h4>Registration</h4>
+                                <p>Sign up and pay entry fee</p>
+                            </div>
+                            <div class="card" style="text-align: center;">
+                                <div class="card-icon"><i class="fas fa-users"></i></div>
+                                <h4>Group Stage</h4>
+                                <p>Compete in groups</p>
+                            </div>
+                            <div class="card" style="text-align: center;">
+                                <div class="card-icon"><i class="fas fa-sitemap"></i></div>
+                                <h4>Knockout</h4>
+                                <p>64 → 32 → 16 → 8 → 4 → 2</p>
+                            </div>
+                            <div class="card" style="text-align: center;">
+                                <div class="card-icon"><i class="fas fa-trophy"></i></div>
+                                <h4>Finals</h4>
+                                <p>Winner takes all</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderLeagues() {
+            return `
+                <section class="section">
+                    <div class="container">
+                        <h2>League Categories</h2>
+                        <div class="grid grid-2">
+                            ${app.leagues.map(league => `
+                                <div class="card">
+                                    <div style="background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-blue) 100%); padding: 1.5rem; border-radius: 8px; color: var(--primary-dark); margin-bottom: 1rem;">
+                                        <h3 style="margin: 0; color: var(--primary-dark);">${league.name}</h3>
+                                    </div>
+                                    <div class="tournament-stat">
+                                        <label>Entry Fee:</label>
+                                        <value>KES ${league.entry.toLocaleString()}</value>
+                                    </div>
+                                    <div class="tournament-stat">
+                                        <label>Monthly Prize Pool:</label>
+                                        <value class="text-gold">KES ${league.prize.toLocaleString()}</value>
+                                    </div>
+                                    <div class="tournament-stat">
+                                        <label>Active Players:</label>
+                                        <value>${league.participants}</value>
+                                    </div>
+                                    <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">
+                                        <i class="fas fa-arrow-right"></i> Join League
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="container">
+                        <h2>How Leagues Work</h2>
+                        <div class="grid grid-3">
+                            <div class="card">
+                                <div class="card-icon"><i class="fas fa-plus-circle"></i></div>
+                                <h4>1. Join</h4>
+                                <p>Pay the entry fee and join your desired league tier.</p>
+                            </div>
+                            <div class="card">
+                                <div class="card-icon"><i class="fas fa-gamepad"></i></div>
+                                <h4>2. Play</h4>
+                                <p>Compete against other players throughout the month.</p>
+                            </div>
+                            <div class="card">
+                                <div class="card-icon"><i class="fas fa-money-bill"></i></div>
+                                <h4>3. Earn</h4>
+                                <p>Win prizes based on your final ranking.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderLeaderboard() {
+            return `
+                <section class="section">
+                    <div class="container">
+                        <h2>Global Leaderboard</h2>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Player</th>
+                                        <th>Wins</th>
+                                        <th>Points</th>
+                                        <th>League</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${app.leaderboard.map(player => `
+                                        <tr>
+                                            <td>
+                                                <strong style="font-size: 1.2rem;">
+                                                    ${player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : '#' + player.rank}
+                                                </strong>
+                                            </td>
+                                            <td><strong>${player.name}</strong></td>
+                                            <td>${player.wins}</td>
+                                            <td class="text-gold"><strong>${player.points.toLocaleString()}</strong></td>
+                                            <td><span class="status-badge status-completed">${player.league}</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderDashboard() {
+            return `
+                <div class="dashboard">
+                    <aside class="sidebar">
+                        <ul class="sidebar-menu">
+                            <li><a href="#" onclick="navigate('dashboard')" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                            <li><a href="#" onclick="navigate('wallet')"><i class="fas fa-wallet"></i> Wallet</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-trophy"></i> Tournaments</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-crown"></i> Leagues</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-history"></i> Match History</a></li>
+                            <li><a href="#" onclick="navigate('leaderboard')"><i class="fas fa-chart-line"></i> Leaderboard</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-bell"></i> Notifications</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-user"></i> Profile</a></li>
+                            <li><a href="#" onclick="navigate('kyc')"><i class="fas fa-id-card"></i> KYC Verification</a></li>
+                            <li><a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </aside>
+
+                    <div class="main-content">
+                        <h2>Welcome, ${app.user?.username || 'Player'}!</h2>
+                        
+                        <h3 style="margin-top: 2rem;">Your Statistics</h3>
+                        <div class="dashboard-cards">
+                            <div class="balance-card">
+                                <div class="balance-label"><i class="fas fa-wallet"></i> Wallet Balance</div>
+                                <div class="balance-value">KES 45,230</div>
+                                <div class="balance-change"><i class="fas fa-arrow-up"></i> +KES 5,000 this month</div>
+                            </div>
+                            <div class="balance-card">
+                                <div class="balance-label"><i class="fas fa-gamepad"></i> Active Tournaments</div>
+                                <div class="balance-value">3</div>
+                                <div class="balance-change">2 in group stage, 1 in finals</div>
+                            </div>
+                            <div class="balance-card">
+                                <div class="balance-label"><i class="fas fa-award"></i> League Ranking</div>
+                                <div class="balance-value">#147</div>
+                                <div class="balance-change">Gold League</div>
+                            </div>
+                            <div class="balance-card">
+                                <div class="balance-label"><i class="fas fa-trophy"></i> Total Wins</div>
+                                <div class="balance-value">42</div>
+                                <div class="balance-change">Win rate: 68%</div>
+                            </div>
+                        </div>
+
+                        <h3 style="margin-top: 2rem;">Upcoming Matches</h3>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tournament</th>
+                                        <th>Opponent</th>
+                                        <th>Time</th>
+                                        <th>Prize</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Elite Challenge</td>
+                                        <td>ProGamer_KE</td>
+                                        <td>Today, 8:00 PM</td>
+                                        <td class="text-gold">KES 10,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Weekend Warrior</td>
+                                        <td>EliteStrike</td>
+                                        <td>Tomorrow, 6:00 PM</td>
+                                        <td class="text-gold">KES 5,000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 style="margin-top: 2rem;">Recent Transactions</h3>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${app.transactions.slice(0, 3).map(tx => `
+                                        <tr>
+                                            <td>${tx.date}</td>
+                                            <td>${tx.type}</td>
+                                            <td class="text-gold">KES ${tx.amount.toLocaleString()}</td>
+                                            <td><span class="status-badge ${tx.status === 'Completed' ? 'status-completed' : 'status-pending'}">${tx.status}</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderWallet() {
+            return `
+                <div class="dashboard">
+                    <aside class="sidebar">
+                        <ul class="sidebar-menu">
+                            <li><a href="#" onclick="navigate('dashboard')"><i class="fas fa-home"></i> Dashboard</a></li>
+                            <li><a href="#" onclick="navigate('wallet')" class="active"><i class="fas fa-wallet"></i> Wallet</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-trophy"></i> Tournaments</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-crown"></i> Leagues</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-history"></i> Match History</a></li>
+                            <li><a href="#" onclick="navigate('leaderboard')"><i class="fas fa-chart-line"></i> Leaderboard</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-bell"></i> Notifications</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-user"></i> Profile</a></li>
+                            <li><a href="#" onclick="navigate('kyc')"><i class="fas fa-id-card"></i> KYC Verification</a></li>
+                            <li><a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </aside>
+
+                    <div class="main-content">
+                        <h2>Wallet Management</h2>
+
+                        <div class="dashboard-cards">
+                            <div class="balance-card">
+                                <div class="balance-label"><i class="fas fa-wallet"></i> Current Balance</div>
+                                <div class="balance-value">KES 45,230</div>
+                                <div class="balance-change">Updated just now</div>
+                            </div>
+                        </div>
+
+                        <h3 style="margin-top: 2rem;">Quick Actions</h3>
+                        <div class="grid grid-2">
+                            <div class="card flex-col items-center justify-center" style="text-align: center; padding: 3rem 2rem;">
+                                <div class="card-icon" style="font-size: 3rem;"><i class="fas fa-arrow-down"></i></div>
+                                <h4>Deposit Funds</h4>
+                                <p>Add money to your wallet to join tournaments</p>
+                                <button class="btn btn-primary" onclick="openModal('depositModal')" style="margin-top: 1rem;">
+                                    <i class="fas fa-plus"></i> Deposit Now
+                                </button>
+                            </div>
+                            <div class="card flex-col items-center justify-center" style="text-align: center; padding: 3rem 2rem;">
+                                <div class="card-icon" style="font-size: 3rem;"><i class="fas fa-arrow-up"></i></div>
+                                <h4>Withdraw Funds</h4>
+                                <p>Withdraw your winnings to M-Pesa or Pesapal</p>
+                                <button class="btn btn-primary" onclick="openModal('withdrawModal')" style="margin-top: 1rem;">
+                                    <i class="fas fa-arrow-up"></i> Withdraw
+                                </button>
+                            </div>
+                        </div>
+
+                        <h3 style="margin-top: 2rem;">Transaction History</h3>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Method</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${app.transactions.map(tx => `
+                                        <tr>
+                                            <td>${tx.date}</td>
+                                            <td>${tx.type}</td>
+                                            <td class="text-gold">KES ${tx.amount.toLocaleString()}</td>
+                                            <td>${tx.method}</td>
+                                            <td><span class="status-badge ${tx.status === 'Completed' ? 'status-completed' : 'status-pending'}">${tx.status}</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                ${renderDepositModal()}
+                ${renderWithdrawModal()}
+            `;
+        }
+
+        function renderDepositModal() {
+            return `
+                <div id="depositModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Deposit Funds</h3>
+                            <button class="modal-close" onclick="closeModal('depositModal')"><i class="fas fa-times"></i></button>
+                        </div>
+                        <form onsubmit="handleDeposit(event)">
+                            <div class="form-group">
+                                <label>Amount (KES)</label>
+                                <input type="number" min="100" step="100" required placeholder="Enter amount">
+                            </div>
+                            <div class="form-group">
+                                <label>Payment Method</label>
+                                <select required onchange="updatePaymentInfo(this.value)">
+                                    <option>Select Payment Method</option>
+                                    <option>M-Pesa</option>
+                                    <option>Pesapal</option>
+                                    <option>IntaSend</option>
+                                </select>
+                            </div>
+                            <div id="paymentInfo" class="card" style="background: rgba(0, 212, 255, 0.05); border: 1px solid var(--accent-blue); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: none;">
+                                <div id="paymentDetails"></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-credit-card"></i> Proceed to Payment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderWithdrawModal() {
+            return `
+                <div id="withdrawModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Withdraw Funds</h3>
+                            <button class="modal-close" onclick="closeModal('withdrawModal')"><i class="fas fa-times"></i></button>
+                        </div>
+                        <form onsubmit="handleWithdraw(event)">
+                            <div class="form-group">
+                                <label>Available Balance</label>
+                                <input type="text" value="KES 45,230" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Withdrawal Amount (KES)</label>
+                                <input type="number" min="500" step="100" required placeholder="Enter amount">
+                            </div>
+                            <div class="form-group">
+                                <label>Withdrawal Method</label>
+                                <select required>
+                                    <option>Select Method</option>
+                                    <option>M-Pesa</option>
+                                    <option>Pesapal</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-money-bill"></i> Request Withdrawal
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderKYC() {
+            return `
+                <div class="dashboard">
+                    <aside class="sidebar">
+                        <ul class="sidebar-menu">
+                            <li><a href="#" onclick="navigate('dashboard')"><i class="fas fa-home"></i> Dashboard</a></li>
+                            <li><a href="#" onclick="navigate('wallet')"><i class="fas fa-wallet"></i> Wallet</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-trophy"></i> Tournaments</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-crown"></i> Leagues</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-history"></i> Match History</a></li>
+                            <li><a href="#" onclick="navigate('leaderboard')"><i class="fas fa-chart-line"></i> Leaderboard</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-bell"></i> Notifications</a></li>
+                            <li><a href="#" onclick=""><i class="fas fa-user"></i> Profile</a></li>
+                            <li><a href="#" onclick="navigate('kyc')" class="active"><i class="fas fa-id-card"></i> KYC Verification</a></li>
+                            <li><a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </aside>
+
+                    <div class="main-content">
+                        <h2>KYC Verification</h2>
+                        <p>Complete verification to unlock higher withdrawal limits and access premium features.</p>
+
+                        <div class="card" style="background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%); border: 1px solid var(--success); margin-bottom: 2rem; padding: 2rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--success);"></i>
+                                <div>
+                                    <h4 style="margin: 0; color: var(--success);">Verification Status: <strong>APPROVED</strong></h4>
+                                    <p style="margin: 0.5rem 0 0 0;">Your account is fully verified. Enjoy all platform features!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3>Verification Documents</h3>
+                        <div class="grid grid-2">
+                            <div class="card">
+                                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                    <i class="fas fa-id-card" style="font-size: 2rem; color: var(--success);"></i>
+                                    <div>
+                                        <h4 style="margin: 0;">National ID / Passport</h4>
+                                        <span class="status-badge status-completed">Verified</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                    <i class="fas fa-camera" style="font-size: 2rem; color: var(--success);"></i>
+                                    <div>
+                                        <h4 style="margin: 0;">Selfie Photo</h4>
+                                        <span class="status-badge status-completed">Verified</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                    <i class="fas fa-phone" style="font-size: 2rem; color: var(--success);"></i>
+                                    <div>
+                                        <h4 style="margin: 0;">Phone Verification</h4>
+                                        <span class="status-badge status-completed">Verified</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                    <i class="fas fa-envelope" style="font-size: 2rem; color: var(--success);"></i>
+                                    <div>
+                                        <h4 style="margin: 0;">Email Verification</h4>
+                                        <span class="status-badge status-completed">Verified</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSponsors() {
+            return `
+                <section class="section">
+                    <div class="container">
+                        <h2>Our Sponsors</h2>
+                        <p style="text-align: center; max-width: 700px; margin: 0 auto 3rem;">
+                            Munene Esports Arena is proudly supported by leading brands and organizations committed to growing esports in Africa.
+                        </p>
+                        <div class="grid grid-3">
+                            <div class="card" style="text-align: center;">
+                                <div class="card-icon"><i class="fas fa-crown"></i></div>
+                                <h4>Platinum Sponsors</h4>
+                                <ul style="list-style: none; color: var(--text-secondary);">
+                                    <li>TechCorp Kenya</li>
+                                    <li>Gaming Elite</li>
+                                </ul>
+                            </div>
+                            <div class="card" style="text-align: center;">
+                                <div class="card-icon"><i class="fas fa-medal"></i></div>
+                                <h4>Gold Sponsors</h4>
+                                <ul style="list-style: none; color: var(--text-secondary);">
+                                    <li>EsportsHub Africa</li>
+                                    <li>Digital Champions</li>
+                                    <li>Gaming Future</li>
+                                </ul>
+                            </div>
+                            <div class="card" style="text-align: center;">
+                                <div class="card-icon"><i class="fas fa-star"></i></div>
+                                <h4>Official Partners</h4>
+                                <ul style="list-style: none; color: var(--text-secondary);">
+                                    <li>Telecom Partners</li>
+                                    <li>Payment Gateway</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="container">
+                        <h2>Become a Sponsor</h2>
+                        <div class="card" style="max-width: 700px; margin: 0 auto;">
+                            <p>Grow your brand by sponsoring Munene Esports Arena tournaments and events. Reach thousands of engaged gamers across Africa.</p>
+                            <form onsubmit="alert('Sponsor inquiry submitted. Our team will contact you soon!')">
+                                <div class="form-group">
+                                    <label>Company Name</label>
+                                    <input type="text" required placeholder="Your company">
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" required placeholder="contact@company.com">
+                                </div>
+                                <div class="form-group">
+                                    <label>Message</label>
+                                    <textarea required placeholder="Tell us about your sponsorship interest"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                    <i class="fas fa-paper-plane"></i> Send Inquiry
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderAbout() {
+            return `
+                <section class="section">
+                    <div class="container">
+                        <h2>About Munene Esports Arena</h2>
+                        <div class="card" style="max-width: 900px; margin: 0 auto;">
+                            <p>Munene Esports Arena is Africa's premier eFootball tournament platform dedicated to connecting players, fostering competitive gaming, and offering real monetary rewards. Founded in 2024, we've created a secure, transparent, and exciting ecosystem where gamers can showcase their skills and compete at the highest level.</p>
+                            
+                            <h3>Our Mission</h3>
+                            <p>To revolutionize competitive gaming in Africa by providing a professional, accessible platform where players can compete, earn, and build successful gaming careers.</p>
+
+                            <h3>Our Vision</h3>
+                            <p>To become the most trusted and largest esports tournament platform in Africa, fostering a global community of competitive eFootball players.</p>
+
+                            <h3>Why Choose Us</h3>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 0.5rem 0;"><strong>✓ Secure Platform:</strong> SSL encryption, KYC verification, secure payments</li>
+                                <li style="padding: 0.5rem 0;"><strong>✓ Real Rewards:</strong> Genuine prize pools and instant payouts</li>
+                                <li style="padding: 0.5rem 0;"><strong>✓ Fair Gameplay:</strong> Anti-cheat systems and transparent tournament structures</li>
+                                <li style="padding: 0.5rem 0;"><strong>✓ 24/7 Support:</strong> Dedicated customer support team</li>
+                                <li style="padding: 0.5rem 0;"><strong>✓ Community:</strong> Connect with thousands of African gamers</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderContact() {
+            return `
+                <section class="section">
+                    <div class="container">
+                        <h2>Contact Us</h2>
+                        <div class="grid grid-2">
+                            <div class="card">
+                                <h4 style="margin-bottom: 1.5rem;">Get in Touch</h4>
+                                <form onsubmit="handleContactSubmit(event)">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input type="text" required placeholder="Your name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="email" required placeholder="your@email.com">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Subject</label>
+                                        <select required>
+                                            <option>Select Subject</option>
+                                            <option>General Inquiry</option>
+                                            <option>Technical Support</option>
+                                            <option>Account Issue</option>
+                                            <option>Payment Issue</option>
+                                            <option>Sponsorship</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Message</label>
+                                        <textarea required placeholder="Your message"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                        <i class="fas fa-paper-plane"></i> Send Message
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="card">
+                                <h4 style="margin-bottom: 1.5rem;"><i class="fas fa-headset"></i> Support</h4>
+                                <div style="margin-bottom: 2rem;">
+                                    <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Email</h5>
+                                    <a href="mailto:support@munenearena.com">support@munenearena.com</a>
+                                </div>
+                                <div style="margin-bottom: 2rem;">
+                                    <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Phone</h5>
+                                    <a href="tel:+254708636339">+254 708 636 339</a>
+                                </div>
+                                <div style="margin-bottom: 2rem;">
+                                    <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Availability</h5>
+                                    <p style="margin: 0;">24/7 Support Available</p>
+                                </div>
+                                <div>
+                                    <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Follow Us</h5>
+                                    <div class="social-links">
+                                        <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+                                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                                        <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderTerms() {
+            return `
+                <section class="section">
+                    <div class="container">
+                        <div class="card" style="max-width: 900px; margin: 0 auto;">
+                            <h2>Terms of Service</h2>
+                            <p><strong>Effective Date:</strong> January 1, 2024</p>
+                            
+                            <h3>1. Acceptance of Terms</h3>
+                            <p>By accessing and using Munene Esports Arena, you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to abide by the above, please do not use this service.</p>
+
+                            <h3>2. Use License</h3>
+                            <p>Permission is granted to temporarily download one copy of the materials (information or software) on Munene Esports Arena for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
+                            <ul style="margin: 1rem 0;">
+                                <li>Modifying or copying the materials</li>
+                                <li>Using the materials for any commercial purpose or for any public display</li>
+                                <li>Attempting to decompile or reverse engineer any software contained on Munene Esports Arena</li>
+                                <li>Removing any copyright or other proprietary notations from the materials</li>
+                            </ul>
+
+                            <h3>3. Age Requirement</h3>
+                            <p>You must be at least 18 years old to use this platform and participate in tournaments.</p>
+
+                            <h3>4. User Accounts</h3>
+                            <p>When you create an account, you are responsible for maintaining the confidentiality of your password and account information and are fully responsible for all activities that occur under your account.</p>
+
+                            <h3>5. Limitation of Liability</h3>
+                            <p>In no event shall Munene Esports Arena or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Munene Esports Arena.</p>
+
+                            <p style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">For more information, please contact us at legal@munenearena.com</p>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderPrivacy() {
+            return `
+                <section class="section">
+                    <div class="container">
+                        <div class="card" style="max-width: 900px; margin: 0 auto;">
+                            <h2>Privacy Policy</h2>
+                            <p><strong>Effective Date:</strong> January 1, 2024</p>
+
+                            <h3>1. Information We Collect</h3>
+                            <p>We collect information you provide directly to us, such as:</p>
+                            <ul style="margin: 1rem 0;">
+                                <li>Account registration information (name, email, phone)</li>
+                                <li>Payment information for deposits and withdrawals</li>
+                                <li>KYC documentation (ID, selfie, etc.)</li>
+                                <li>Gameplay and tournament data</li>
+                            </ul>
+
+                            <h3>2. How We Use Your Information</h3>
+                            <p>We use the information we collect for:</p>
+                            <ul style="margin: 1rem 0;">
+                                <li>Operating and improving the platform</li>
+                                <li>Processing payments and withdrawals</li>
+                                <li>Providing customer support</li>
+                                <li>Ensuring compliance with regulations</li>
+                                <li>Fraud prevention and security</li>
+                            </ul>
+
+                            <h3>3. Data Security</h3>
+                            <p>We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+
+                            <h3>4. Third-Party Sharing</h3>
+                            <p>We do not sell, trade, or share your personal information with third parties except as required by law or with your explicit consent.</p>
+
+                            <h3>5. Your Rights</h3>
+                            <p>You have the right to access, correct, or delete your personal information. Contact us at privacy@munenearena.com to exercise these rights.</p>
+
+                            <p style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">For privacy inquiries, contact privacy@munenearena.com</p>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderResponsible() {
+            return `
+                <section class="section">
+                    <div class="container">
+                        <div class="card" style="max-width: 900px; margin: 0 auto;">
+                            <h2>Responsible Gaming Policy</h2>
+                            <p><strong>Effective Date:</strong> January 1, 2024</p>
+
+                            <h3>Our Commitment</h3>
+                            <p>Munene Esports Arena is committed to promoting responsible gaming practices and protecting player wellbeing. We believe gaming should be enjoyable and entertainment-focused.</p>
+
+                            <h3>1. Age Verification</h3>
+                            <p>We strictly enforce age restrictions. Users must be 18 years or older to participate in tournaments and financial transactions.</p>
+
+                            <h3>2. Spending Limits</h3>
+                            <p>Players can set daily, weekly, and monthly spending limits on their accounts. We encourage setting limits you can afford to lose.</p>
+
+                            <h3>3. Self-Exclusion</h3>
+                            <p>If you believe you have a gambling problem, you can request self-exclusion from our platform. Contact support for assistance.</p>
+
+                            <h3>4. Support Resources</h3>
+                            <p>If you or someone you know needs help, we provide resources and links to support organizations:</p>
+                            <ul style="margin: 1rem 0;">
+                                <li>National Council on Problem Gambling</li>
+                                <li>Gamblers Anonymous</li>
+                                <li>Problem Gambling Helpline</li>
+                            </ul>
+
+                            <h3>5. Fair Play</h3>
+                            <p>We maintain strict anti-cheat systems and fair play policies to ensure all players have equal opportunities.</p>
+
+                            <p style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">For support, contact support@munenearena.com or call +254 708 636 339</p>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        // ==================== EVENT HANDLERS ====================
+        function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            
+            // Store user data
+            app.user = { username, email, isLoggedIn: true };
+            app.isLoggedIn = true;
+            localStorage.setItem('user', JSON.stringify(app.user));
+            localStorage.setItem('isLoggedIn', 'true');
+            
+            alert(`Welcome ${username}! Your account has been created. Please log in.`);
+            navigate('login');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Simulate login
+            app.user = { 
+                username: email.split('@')[0], 
+                email: email,
+                isLoggedIn: true 
+            };
+            app.isLoggedIn = true;
+            localStorage.setItem('user', JSON.stringify(app.user));
+            localStorage.setItem('isLoggedIn', 'true');
+            
+            alert(`Welcome back, ${app.user.username}!`);
+            navigate('dashboard');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                app.isLoggedIn = false;
+                app.user = null;
+                localStorage.removeItem('user');
+                localStorage.removeItem('isLoggedIn');
+                navigate('home');
+            }
+        }
+
+        function handleDeposit(event) {
+            event.preventDefault();
+            const amount = event.target.querySelector('input[type="number"]').value;
+            alert(`Deposit of KES ${amount} initiated. Redirecting to payment...`);
+            closeModal('depositModal');
+        }
+
+        function handleWithdraw(event) {
+            event.preventDefault();
+            const amount = event.target.querySelector('input[type="number"]').value;
+            alert(`Withdrawal request of KES ${amount} submitted. Processing may take 1-3 business days.`);
+            closeModal('withdrawModal');
+        }
+
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            alert('Thank you! Your message has been received. We will get back to you shortly.');
+            event.target.reset();
+        }
+
+        function updatePaymentInfo(method) {
+            const infoCont = document.getElementById('paymentInfo');
+            const details = document.getElementById('paymentDetails');
+            
+            const methods = {
+                'M-Pesa': '<strong>M-Pesa Details:</strong><br>Business Name: Munene Arena<br>Paybill: 247247<br>Account Number: 0708636339',
+                'Pesapal': '<strong>Pesapal Details:</strong><br>Business: Munene Esports Arena<br>Use your phone number to complete payment',
+                'IntaSend': '<strong>IntaSend Details:</strong><br>Secure payment gateway<br>Follow the payment instructions'
+            };
+            
+            if (methods[method]) {
+                details.innerHTML = methods[method];
+                infoCont.style.display = 'block';
+            } else {
+                infoCont.style.display = 'none';
+            }
+        }
+
+        // ==================== MODAL FUNCTIONS ====================
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.add('active');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('active');
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            }
+        });
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPage();
+        });
+    </script>
+</body>
+</html>
